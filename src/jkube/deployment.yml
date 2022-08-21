@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  ${project.artifactId}
+  labels:
+    app:  ${project.artifactId}
+    commit: ${git.commit.id.describe}
+spec:
+  replicas: ${deployment.replicas}
+  selector:
+    matchLabels:
+      app: ${project.artifactId}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        secgroup: app-tier
+        app: ${project.artifactId}
+    spec:
+      imagePullSecrets:
+        - name: 9990042-timon
+      containers:
+      - name: ${project.artifactId}
+        resources:
+          requests:
+            cpu: 250m
+            memory: 128Mi
+          limits:
+            cpu: 1000m
+            memory: 256Mi
+        env:
+        - name: JAVA_OPTS
+          value: "-Xms128m -Xmx128m"
+
+
+
